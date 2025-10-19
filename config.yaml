@@ -1,0 +1,95 @@
+# Backtester Configuration File
+
+# Data sources
+data:
+  # Path to price data (CSV or Parquet)
+  price_data: "data/prices.csv"
+  
+  # Optional: Pre-generated signals file
+  signal_file: null
+  
+  # Date range (null = use all available data)
+  start_date: null
+  end_date: null
+  
+  # Primary timeframe for backtesting
+  timeframe: "1D"  # 1min, 5min, 1H, 1D, etc.
+  
+  # Adjust prices for splits/dividends
+  adjust_prices: true
+
+# Capital settings
+capital:
+  initial: 100000
+  currency: "USD"
+
+# Execution settings
+execution:
+  # Slippage in basis points (100 bps = 1%)
+  slippage_bps: 5
+  
+  # Commission in basis points
+  commission_bps: 2
+  
+  # Execution model: "first_touch" or "close"
+  fill_model: "first_touch"
+  
+  # Allow partial fills
+  partial_fills: false
+
+# Risk management
+risk:
+  # Maximum position size as fraction of portfolio
+  max_position_pct: 0.20
+  
+  # Maximum total leverage
+  max_portfolio_leverage: 1.0
+  
+  # Stop loss percentage (null = no stop)
+  stop_loss_pct: null
+  
+  # Take profit percentage (null = no target)
+  take_profit_pct: null
+  
+  # Position sizing method: "fixed", "fraction", "volatility"
+  sizing_method: "fraction"
+  
+  # Volatility lookback period (for vol-based sizing)
+  vol_lookback: 20
+  
+  # Target volatility (for vol-based sizing)
+  target_vol: 0.15
+
+# End-of-day processing
+eod:
+  # Close all positions at end of backtest
+  close_all_eod: false
+  
+  # Mark-to-market frequency: "daily", "bar", "fill"
+  mtm_frequency: "daily"
+
+# Reporting
+reporting:
+  # Output directory
+  output_dir: "results"
+  
+  # Export trade log
+  export_trades: true
+  
+  # Export metrics
+  export_metrics: true
+  
+  # Generate plots
+  generate_plots: true
+  
+  # Plot types: equity_curve, drawdown, returns_dist, monthly_returns
+  plots:
+    - equity_curve
+    - drawdown
+    - returns_dist
+
+# Logging
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  file: "backtest.log"
+  console: true
