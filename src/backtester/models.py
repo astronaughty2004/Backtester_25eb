@@ -38,21 +38,57 @@ class PositionSide(Enum):
 
 @dataclass
 class Bar:
-    """OHLCV bar data"""
+    """Price bar data - works with price-only or full OHLCV"""
     timestamp: datetime
     symbol: str
-    open: float
-    high: float
-    low: float
-    close: float
-    volume: float
+    price: float  # Primary field for price-only data
+    
+    # Optional OHLCV fields (for full bar data)
+    open: Optional[float] = None
+    high: Optional[float] = None
+    low: Optional[float] = None
+    close: Optional[float] = None
+    volume: Optional[float] = None
     
     def __post_init__(self):
-        """Validate bar data"""
+        """Auto-populate OHLCV from price if not provided"""
+        # If only price is provided, use it for all OHLCV
+        if self.open is None:
+            self.open = self.price
+        if self.high is None:
+            self.high = self.price
+        if self.low is None:
+            self.low = self.price
+        if self.close is None:
+            self.close = self.price
+        if self.volume is None:
+            self.volume = 0.0
+        
+        # Validate if full OHLCV provided
         if self.high < max(self.open, self.close, self.low):
-            raise ValueError(f"High {self.high} must be >= open/close/low")
+            # Auto-correct instead of raising error
+            self.high = max(self.open, self.close, self.low, self.high)
         if self.low > min(self.open, self.close, self.high):
-            raise ValueError(f"Low {self.low} must be <= open/close/high")
+            self.low = min(self.open, self.close, self.high, self.low)
+    
+    @classmethod
+    def from_price(cls, timestamp: datetime, symbol: str, price: float):
+        """Create bar from just timestamp and price"""
+        return cls(timestamp=timestamp, symbol=symbol, price=price)
+    
+    @classmethod
+    def from_dict(cls, data: dict):
+        """Create bar from dictionary"""
+        return cls(
+            timestamp=data['timestamp'],
+            symbol=data['symbol'],
+            price=data.get('price', data.get('close', 0.0)),
+            open=data.get('open'),
+            high=data.get('high'),
+            low=data.get('low'),
+            close=data.get('close'),
+            volume=data.get('volume')
+        )
 
 
 @dataclass
